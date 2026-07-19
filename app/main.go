@@ -23,7 +23,7 @@ func main() {
 		}
 		command += line
 		line = strings.TrimSpace(line)
-		fmt.Println("$", line, ": command not found")
+		fmt.Println(line + ": command not found")
 		fmt.Print("$ ")
 	}
 
