@@ -25,16 +25,25 @@ func main() {
 
 		if command == "" {
 			continue
-		}
-		if command == "exit" {
+		} else if command == "exit" {
 			os.Exit(0)
-		}
-		if command[:4] == "echo" {
+		} else if strings.HasPrefix(command, "echo ") {
 			fmt.Fprintln(os.Stdout, command[5:])
 			continue
+		} else if strings.HasPrefix(command, "type ") {
+			if strings.HasSuffix(command, "echo") {
+				fmt.Fprintln(os.Stdout, "echo is a shell builtin")
+				continue
+			} else if strings.HasSuffix(command, "exit") {
+				fmt.Fprintln(os.Stdout, "exit is a shell builtin")
+				continue
+			} else {
+				fmt.Fprintln(os.Stdout, command[5:]+": not found")
+				continue
+			}
 		}
-
 		fmt.Fprintln(os.Stdout, command+": command not found")
+
 	}
 
 }
