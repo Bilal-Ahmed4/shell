@@ -37,6 +37,9 @@ func main() {
 			} else if strings.HasSuffix(command, "exit") {
 				fmt.Fprintln(os.Stdout, "exit is a shell builtin")
 				continue
+			} else if strings.HasPrefix(command, "type ") {
+				fmt.Fprintln(os.Stdout, "type is a shell builtin")
+				continue
 			} else {
 				fmt.Fprintln(os.Stdout, command[5:]+": not found")
 				continue
