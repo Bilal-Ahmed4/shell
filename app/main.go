@@ -19,12 +19,15 @@ func main() {
 
 		line, err := reader.ReadString('\n')
 		if err != nil {
-			break
+			os.Exit(1)
 		}
 		command := strings.TrimSpace(line)
 
 		if command == "" {
 			continue
+		}
+		if command == "exit" {
+			os.Exit(0)
 		}
 
 		fmt.Fprintln(os.Stdout, command+": command not found")
