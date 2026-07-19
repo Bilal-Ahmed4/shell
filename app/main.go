@@ -12,22 +12,22 @@ var _ = fmt.Print
 
 func main() {
 	// TODO: Uncomment the code below to pass the first stage
-	func main() {
-		reader := bufio.NewReader(os.Stdin)
-		for {
-			fmt.Fprint(os.Stdout, "$ ")
 
-			line, err := reader.ReadString('\n')
-			if err != nil {
-				break
-			}
-			command := strings.TrimSpace(line)
+	reader := bufio.NewReader(os.Stdin)
+	for {
+		fmt.Fprint(os.Stdout, "$ ")
 
-			if command == "" {
-				continue
-			}
-
-			fmt.Fprintln(os.Stdout, command+": command not found")
+		line, err := reader.ReadString('\n')
+		if err != nil {
+			break
 		}
+		command := strings.TrimSpace(line)
+
+		if command == "" {
+			continue
+		}
+
+		fmt.Fprintln(os.Stdout, command+": command not found")
+	}
 
 }
