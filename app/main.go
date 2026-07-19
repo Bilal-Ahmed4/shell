@@ -29,6 +29,10 @@ func main() {
 		if command == "exit" {
 			os.Exit(0)
 		}
+		if command[:4] == "echo" {
+			fmt.Fprintln(os.Stdout, command[5:])
+			continue
+		}
 
 		fmt.Fprintln(os.Stdout, command+": command not found")
 	}
