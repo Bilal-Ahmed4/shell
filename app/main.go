@@ -18,9 +18,9 @@ func findPath(target string) (string, bool) {
 }
 
 func main() {
+	// TODO: Uncomment the code below to pass the first stage
 	reader := bufio.NewReader(os.Stdin)
 	builtins := []string{"echo", "exit", "type"}
-
 	for {
 		fmt.Fprint(os.Stdout, "$ ")
 		line, err := reader.ReadString('\n')
@@ -28,37 +28,30 @@ func main() {
 			os.Exit(1)
 		}
 		command := strings.TrimSpace(line)
+		tokens := strings.Split(command, " ")
+
 		if command == "" {
 			continue
-		}
-
-		tokens := strings.Split(command, " ")
-		cmd := tokens[0]
-		args := tokens[1:]
-
-		switch {
-		case cmd == "exit":
+		} else if command == "exit" {
 			os.Exit(0)
-
-		case strings.HasPrefix(command, "echo "):
+		} else if strings.HasPrefix(command, "echo ") {
 			fmt.Fprintln(os.Stdout, command[5:])
-
-		case cmd == "type":
-			if len(args) == 0 {
+			continue
+		} else if tokens[0] == "type" {
+			if len(tokens) < 2 {
 				continue
 			}
-			target := args[0]
-
+			target := tokens[1]
+			path, ok := findPath(target)
 			if slices.Contains(builtins, target) {
 				fmt.Fprintln(os.Stdout, target+" is a shell builtin")
-			} else if path, ok := findPath(target); ok {
-				fmt.Fprintln(os.Stdout, target+" is "+path)
+			} else if ok {
+				fmt.Fprintln(os.Stdout, target, "is", path)
 			} else {
 				fmt.Fprintln(os.Stdout, target+": not found")
 			}
-
-		default:
-			fmt.Fprintln(os.Stdout, command+": command not found")
+			continue
 		}
+		fmt.Fprintln(os.Stdout, command+": command not found")
 	}
 }
