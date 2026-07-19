@@ -4,12 +4,18 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"os/exec"
 	"slices"
 	"strings"
 )
 
-// Ensures gofmt doesn't remove the "fmt" import in stage 1 (feel free to remove this!)
-var _ = fmt.Print
+func findPath(target string) (string, bool) {
+	path, err := exec.LookPath(target)
+	if err != nil {
+		return "", false
+	}
+	return path, true
+}
 
 func main() {
 	// TODO: Uncomment the code below to pass the first stage
@@ -26,6 +32,7 @@ func main() {
 		}
 		command := strings.TrimSpace(line)
 		tokens := strings.Split(command, " ")
+		path, ok := findPath(tokens[1])
 
 		if command == "" {
 			continue
@@ -36,6 +43,9 @@ func main() {
 			continue
 		} else if tokens[0] == "type" && slices.Contains(builtins, tokens[1]) {
 			fmt.Fprintln(os.Stdout, tokens[1]+" is a shell builtin")
+			continue
+		} else if tokens[0] == "type" && ok {
+			fmt.Fprintln(os.Stdout, tokens[1], "is", path)
 			continue
 		} else if tokens[0] == "type" {
 			fmt.Fprintln(os.Stdout, tokens[1]+": not found")
