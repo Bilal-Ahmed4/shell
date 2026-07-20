@@ -51,6 +51,18 @@ func main() {
 				fmt.Fprintln(os.Stdout, target+": not found")
 			}
 			continue
+		} else if path, ok := findPath(tokens[0]); ok {
+			cmd := exec.Command(path, tokens[1:]...) // where Go actually finds and runs the file (unchanged) go needs full path to the exe
+			//so cmd.args becomes [path,arg1,arg2,...] but our tester needs [filename,args...]
+			cmd.Args[0] = tokens[0] //so we set it back to the original filename
+			cmd.Stdout = os.Stdout
+			cmd.Stderr = os.Stderr
+			err := cmd.Run()
+			if err != nil {
+				fmt.Fprintln(os.Stderr, err)
+				os.Exit(1)
+			}
+			continue
 		}
 		fmt.Fprintln(os.Stdout, command+": command not found")
 	}
