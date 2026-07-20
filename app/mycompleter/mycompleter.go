@@ -27,6 +27,8 @@ func (c *MyCompleter) Do(line []rune, pos int) (newLine [][]rune, length int) {
 	prefix := string(line[:pos]) // get the prefix and search for matching words
 	matches := autoComplete(prefix, c.Builtins)
 	matches = append(matches, autoCompleteExecutables(prefix)...) //... unpacks the slice into individual elements
+	//removing duplicates
+	matches = removeDuplicates(matches)
 
 	if len(matches) == 0 {
 		fmt.Print("\x07") // ring the bell — no matches
@@ -56,6 +58,18 @@ func autoComplete(line string, builtins []string) []string {
 	}
 
 	return words
+}
+
+func removeDuplicates(words []string) []string {
+	seen := make(map[string]bool)
+	var result []string
+	for _, word := range words {
+		if !seen[word] {
+			seen[word] = true
+			result = append(result, word)
+		}
+	}
+	return result
 }
 
 func autoCompleteExecutables(line string) []string {
