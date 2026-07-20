@@ -1,12 +1,13 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"os"
 	"os/exec"
 	"slices"
 	"strings"
+
+	"github.com/chzyer/readline"
 )
 
 func findPath(target string) (string, bool) {
@@ -19,11 +20,23 @@ func findPath(target string) (string, bool) {
 
 func main() {
 	// TODO: Uncomment the code below to pass the first stage
-	reader := bufio.NewReader(os.Stdin)
+	// completer for the auto completion
+	completer := readline.NewPrefixCompleter(
+		readline.PcItem("echo"),
+		readline.PcItem("exit"),
+		readline.PcItem("type"),
+	)
+	reader, err := readline.NewEx(&readline.Config{
+		Prompt:       "$ ",
+		AutoComplete: completer,
+	})
+	if err != nil {
+		os.Exit(1)
+	}
+	defer reader.Close()
 	builtins := []string{"echo", "exit", "type"}
 	for {
-		fmt.Fprint(os.Stdout, "$ ")
-		line, err := reader.ReadString('\n')
+		line, err := reader.Readline()
 		if err != nil {
 			os.Exit(1)
 		}
@@ -60,7 +73,6 @@ func main() {
 			err := cmd.Run()
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
-				os.Exit(1)
 			}
 			continue
 		}
