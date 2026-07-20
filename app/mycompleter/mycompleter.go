@@ -2,6 +2,7 @@ package mycompleter
 
 import (
 	"fmt"
+	"os"
 	"strings"
 )
 
@@ -25,6 +26,7 @@ type MyCompleter struct {
 func (c *MyCompleter) Do(line []rune, pos int) (newLine [][]rune, length int) {
 	prefix := string(line[:pos]) // get the prefix and search for matching words
 	matches := autoComplete(prefix, c.Builtins)
+	matches = append(matches, autoCompleteExecutables(prefix)...) //... unpacks the slice into individual elements
 
 	if len(matches) == 0 {
 		fmt.Print("\x07") // ring the bell — no matches
@@ -52,5 +54,31 @@ func autoComplete(line string, builtins []string) []string {
 			words = append(words, word)
 		}
 	}
+
 	return words
+}
+
+func autoCompleteExecutables(line string) []string {
+	PATH := os.Getenv("PATH")
+	pathDirs := strings.Split(PATH, string(os.PathListSeparator))
+	var executables []string
+	for _, dir := range pathDirs {
+		entries, err := os.ReadDir(dir)
+		if err != nil {
+			continue
+		}
+		for _, entry := range entries {
+			if !strings.HasPrefix(entry.Name(), line) {
+				continue
+			}
+			info, err := entry.Info()
+			if err != nil {
+				continue
+			}
+			if info.Mode()&0111 != 0 {
+				executables = append(executables, entry.Name())
+			}
+		}
+	}
+	return executables
 }
