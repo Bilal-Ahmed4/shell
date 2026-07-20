@@ -31,6 +31,12 @@ func (c *MyCompleter) Do(line []rune, pos int) (newLine [][]rune, length int) {
 		return nil, 0
 	}
 
+	//when there are exactly one match add a trailing space to indicate completion
+	if len(matches) == 1 {
+		completion := matches[0][len(prefix):] + " " // ← add trailing space
+		return [][]rune{[]rune(completion)}, len(prefix)
+	}
+
 	var result [][]rune
 	for _, m := range matches {
 		completion := m[len(prefix):] // only the remaining part after what's typed
