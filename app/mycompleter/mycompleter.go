@@ -3,6 +3,7 @@ package mycompleter
 import (
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 )
 
@@ -20,7 +21,9 @@ import (
 // length — how many characters of the current input should be considered "replaced" by the completion
 
 type MyCompleter struct {
-	Builtins []string
+	Builtins   []string
+	lastPrefix string
+	tabPressed bool
 }
 
 func (c *MyCompleter) Do(line []rune, pos int) (newLine [][]rune, length int) {
@@ -30,23 +33,44 @@ func (c *MyCompleter) Do(line []rune, pos int) (newLine [][]rune, length int) {
 	//removing duplicates
 	matches = removeDuplicates(matches)
 
+	// sort the matches alphabetically
+	sort.Strings(matches)
+
 	if len(matches) == 0 {
 		fmt.Print("\x07") // ring the bell — no matches
+		c.lastPrefix = ""
+		c.tabPressed = false
 		return nil, 0
 	}
 
 	//when there are exactly one match add a trailing space to indicate completion
 	if len(matches) == 1 {
 		completion := matches[0][len(prefix):] + " " // ← add trailing space
+		c.lastPrefix = ""
+		c.tabPressed = false
 		return [][]rune{[]rune(completion)}, len(prefix)
 	}
 
-	var result [][]rune
-	for _, m := range matches {
-		completion := m[len(prefix):] // only the remaining part after what's typed
-		result = append(result, []rune(completion))
+	if len(matches) >= 2 {
+		if c.tabPressed && c.lastPrefix == prefix {
+			fmt.Println()
+			for _, match := range matches {
+				fmt.Fprint(os.Stdout, match, "  ")
+			}
+			fmt.Println()
+			fmt.Fprint(os.Stdout, "$ ", c.lastPrefix, " ")
+			c.lastPrefix = ""
+			c.tabPressed = false
+			return nil, 0
+		} else {
+			fmt.Print("\x07")
+			c.lastPrefix = prefix
+			c.tabPressed = true
+			return nil, 0
+		}
+
 	}
-	return result, len(prefix)
+	return nil, 0
 }
 
 func autoComplete(line string, builtins []string) []string {
