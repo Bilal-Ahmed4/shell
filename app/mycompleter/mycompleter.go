@@ -55,10 +55,10 @@ func (c *MyCompleter) Do(line []rune, pos int) (newLine [][]rune, length int) {
 		if c.tabPressed && c.lastPrefix == prefix {
 			fmt.Println()
 			for _, match := range matches {
-				fmt.Fprint(os.Stdout, match)
+				fmt.Fprint(os.Stdout, match, "  ")
 			}
 			fmt.Println()
-			fmt.Fprint(os.Stdout, "$ ", c.lastPrefix, " ")
+			fmt.Fprint(os.Stdout, "$ ", c.lastPrefix)
 			c.lastPrefix = ""
 			c.tabPressed = false
 			return nil, 0
